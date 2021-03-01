@@ -1,8 +1,69 @@
 import React from 'react';
 import styled from 'styled-components';
+import StarBorderOutlinedIcon from '@material-ui/icons/StarBorderOutlined';
+import InfoOutlinedIcon from '@material-ui/icons/InfoOutlined';
+import { useSelector } from 'react-redux';
+import { selectRoomId } from '../features/appSlice';
+import ChatInput from './ChatInput';
+import { useCollection, useDocument } from 'react-firebase-hooks/firestore';
+import { db } from '../firebase';
+import Message from './Message';
 
 function Chat() {
-	return <ChatContainer></ChatContainer>;
+	const roomId = useSelector(selectRoomId);
+	console.log('roomId', roomId);
+	const [roomDetails] = useDocument(
+		roomId && db.collection('rooms').doc(roomId)
+	);
+
+	const [roomMessages] = useCollection(
+		roomId &&
+			db
+				.collection('rooms')
+				.doc(roomId)
+				.collection('messages')
+				.orderBy('timestamp', 'asc')
+	);
+
+	console.log('roomDetails', roomDetails);
+	console.log('roomMessage', roomMessages);
+	return (
+		<ChatContainer>
+			<>
+				<Header>
+					<HeaderLeft>
+						<h4>
+							<strong>#{roomDetails?.data().name}</strong>
+						</h4>
+						<StarBorderOutlinedIcon />
+					</HeaderLeft>
+					<HeaderRight>
+						<p>
+							<InfoOutlinedIcon /> Details
+						</p>
+					</HeaderRight>
+				</Header>
+
+				<ChatMessages>
+					{/* fetch and list all  messages*/}
+					{roomMessages?.docs.map((doc) => {
+						const { message, timestamp, user, userImage } = doc.data();
+
+						return (
+							<Message
+								key={doc.id}
+								message={message}
+								timestamp={timestamp}
+								user={user}
+								userImage={userImage}
+							/>
+						);
+					})}
+				</ChatMessages>
+				<ChatInput channelName={roomDetails?.data().name} channelId={roomId} />
+			</>
+		</ChatContainer>
+	);
 }
 
 export default Chat;
@@ -13,3 +74,28 @@ const ChatContainer = styled.div`
 	overflow-y: scroll;
 	margin-top: 60px;
 `;
+
+const Header = styled.div`
+	display: flex;
+	justify-content: space-between;
+	padding: 20px;
+	border-bottom: 1px solid lightgray;
+`;
+
+const HeaderLeft = styled.div`
+	display: flex;
+	align-items: center;
+
+	> h4 {
+		display: flex;
+		text-transform: lowercase;
+		margin-right: 10px;
+	}
+	> h4 .MuiSvgIcon-root {
+		margin-left: 20px;
+		font-size: 18px;
+	}
+`;
+const HeaderRight = styled.div``;
+
+const ChatMessages = styled.div``;
