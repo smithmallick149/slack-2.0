@@ -4,7 +4,7 @@ import firebase from 'firebase';
 import { db } from '../firebase';
 import { Button } from '@material-ui/core';
 
-function ChatInput({ channelName, channelId }, props) {
+function ChatInput({ channelName, channelId, chatRef }, props) {
 	const [input, setInput] = useState('');
 	const sendMessage = (e) => {
 		e.preventDefault();
@@ -21,6 +21,7 @@ function ChatInput({ channelName, channelId }, props) {
 				'https://media-exp1.licdn.com/dms/image/C5103AQE6jJ3YTYbjdQ/profile-displayphoto-shrink_200_200/0/1561550813685?e=1620259200&v=beta&t=Uij4MP-0C4lFd2Snnx8RNJBJYQDv2V5OriyVkxIBJcM',
 		});
 
+		chatRef?.current?.scrollIntoView({ behavior: 'smooth' });
 		setInput('');
 	};
 
