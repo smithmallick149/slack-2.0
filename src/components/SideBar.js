@@ -1,5 +1,5 @@
 import { FiberManualRecord } from '@material-ui/icons';
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import FiberManualRecordIcon from '@material-ui/icons/FiberManualRecord';
 import InsertCommentIcon from '@material-ui/icons/InsertComment';
@@ -13,23 +13,27 @@ import ExpandLessIcon from '@material-ui/icons/ExpandLess';
 import ExpandMoreIcon from '@material-ui/icons/ExpandMore';
 import AddIcon from '@material-ui/icons/Add';
 import CreateIcon from '@material-ui/icons/Create';
+import ExitToAppIcon from '@material-ui/icons/ExitToApp';
 import SidebarOptions from './SidebarOptions';
 import { useCollection } from 'react-firebase-hooks/firestore';
 import { db } from '../firebase';
+import { useAuthState } from 'react-firebase-hooks/auth';
+import { auth } from '../firebase';
 
 const SideBar = () => {
 	const [channels, loading, error] = useCollection(db.collection('rooms'));
+	const [user] = useAuthState(auth);
 
 	console.log('channels', channels);
-
+	const [showChannel, setShowChannel] = useState(false);
 	return (
 		<SidebarContainer>
 			<SidebarHeader>
 				<SidebarInfo>
-					<h2>PAPA FAM HQ </h2>
+					<h2>SMITH SLACK </h2>
 					<h3>
+						{user?.displayName}
 						<FiberManualRecordIcon />
-						smith mallick
 					</h3>
 				</SidebarInfo>
 				<CreateIcon />
@@ -44,12 +48,14 @@ const SideBar = () => {
 			<SidebarOptions Icon={ExpandLessIcon} title="show less" />
 			<hr />
 			<SidebarOptions Icon={ExpandMoreIcon} title="Channels" />
-			<hr />
-			<SidebarOptions Icon={AddIcon} addChannelOption title="Add Channel" />
-
 			{channels?.docs.map((doc) => (
 				<SidebarOptions key={doc.id} id={doc.id} title={doc.data().name} />
 			))}
+			<hr />
+			<SidebarOptions Icon={AddIcon} addChannelOption title="Add Channel" />
+			<SidebarFooter>
+				<SidebarOptions Icon={ExitToAppIcon} title="Logout" logoutToMain />
+			</SidebarFooter>
 		</SidebarContainer>
 	);
 };
@@ -84,6 +90,17 @@ const SidebarHeader = styled.div`
 		border-radius: 999px;
 	}
 `;
+const SidebarFooter = styled.div`
+	/* position: fixed;
+	align-items: flex-end; */
+	position: fixed;
+	/* height: 50px; */
+	/* background-color: red; */
+	bottom: 0px;
+	left: 0px;
+	right: 0px;
+	margin-bottom: 0px;
+`;
 
 const SidebarInfo = styled.div`
 	flex: 1;
@@ -92,6 +109,7 @@ const SidebarInfo = styled.div`
 		font-size: 15px;
 		font-weight: 900;
 		margin-bottom: 5px;
+		text-align: left;
 	}
 
 	> h3 {
