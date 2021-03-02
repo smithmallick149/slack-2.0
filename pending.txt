@@ -1,0 +1,4 @@
+
+1 - more or less dropdown implementation
+2 - threads and other fields not done yet
+3- app chat laoding also not set
